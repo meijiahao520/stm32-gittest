@@ -19,12 +19,15 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "i2c.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "MPU_6050.h"
+#include "motor.h"
+#include "pid.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -46,6 +49,8 @@
 
 /* USER CODE BEGIN PV */
 uint32_t lastTick = 0;  // 上次读取时间戳
+float dt = 0.0f;        // 时间间隔
+float throttle = 50.0f; // 示例总推力（0-100%，可从遥控器输入或固定）
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -65,6 +70,7 @@ void SystemClock_Config(void);
   */
 int main(void)
 {
+
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
@@ -89,10 +95,12 @@ int main(void)
   MX_GPIO_Init();
   MX_I2C1_Init();
   MX_USART1_UART_Init();
+  MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
   if (MPU6050_Init(&hi2c1) != HAL_OK) {
       Error_Handler();  // 初始化失败
   }
+  Motor_Init();  // 初始化电机
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -100,14 +108,15 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-    // 以500Hz（每2ms）更新MPU6050数据并处理
-    if (HAL_GetTick() - lastTick >= 2) {
-        lastTick = HAL_GetTick();
-        if (MPU6050_UpdateData(&hi2c1) != HAL_OK) {  //调取函数并处理错误
-            // 处理错误，例如调用 Error_Handler()
-            Error_Handler();
-        }
+    // 更新MPU6050数据并获取dt
+    if (MPU6050_UpdateData(&hi2c1, &dt) != HAL_OK) {
+        Error_Handler();  // 处理错误
     }
+   
+    // 调用维稳函数（传入throttle和dt）
+    Stabilize_Drone(throttle, dt);
+
+    HAL_Delay(2);  // 简单延时，控制循环频率（可根据需要调整）
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -187,4 +196,3 @@ void assert_failed(uint8_t *file, uint32_t line)
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
-

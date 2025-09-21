@@ -1,10 +1,12 @@
 #include "MPU_6050.h"
 #include "math.h"
+#include "motor.h"  // 包含电机模块以调用Stabilize_Drone
 
 #ifndef M_PI
 #define M_PI acos(-1.0)
 #endif
-// 添加全局变量用于存储角度和时间戳（假设在.h中声明）
+
+// 添加全局变量用于存储角度和时间戳
 volatile float roll = 0.0f, pitch = 0.0f, yaw = 0.0f;
 static uint32_t lastUpdateTick = 0;
 const float alpha = 0.98f;  // 互补滤波系数（可调整，0.98表示更信任陀螺仪）
@@ -57,6 +59,7 @@ HAL_StatusTypeDef MPU6050_UpdateData(I2C_HandleTypeDef *hi2c) {
     uint32_t currentTick = HAL_GetTick();
     float dt = (currentTick - lastUpdateTick) / 1000.0f;  // 转换为秒
     lastUpdateTick = currentTick;
+    *dt_out = dt;  // 输出dt
 
     // 将原始数据转换为实际值（假设量程为±2g和±250°/s，可根据需要调整）
     float accelX = accel.x / 16384.0f;  // 加速度计灵敏度
@@ -82,6 +85,9 @@ HAL_StatusTypeDef MPU6050_UpdateData(I2C_HandleTypeDef *hi2c) {
     // 用户处理代码区域：在此处添加对最终欧拉角的处理逻辑
     // 例如：输出到串口、用于控制等
     
+
+    // 调用维稳（假设throttle在main中定义）
+    // Stabilize_Drone(throttle, dt);  // 在main中调用
 
     return HAL_OK;
 }
