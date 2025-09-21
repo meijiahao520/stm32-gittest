@@ -47,7 +47,7 @@ HAL_StatusTypeDef MPU6050_ReadGyro(I2C_HandleTypeDef *hi2c, GyroData *gyro) {
     return HAL_OK;
 }
 
-HAL_StatusTypeDef MPU6050_UpdateData(I2C_HandleTypeDef *hi2c) {
+HAL_StatusTypeDef MPU6050_UpdateData(I2C_HandleTypeDef *hi2c,float *dt_out) {
     AccelData accel;
     GyroData gyro;
     // 读取加速度计和陀螺仪数据
@@ -91,3 +91,4 @@ HAL_StatusTypeDef MPU6050_UpdateData(I2C_HandleTypeDef *hi2c) {
 
     return HAL_OK;
 }
+

@@ -48,9 +48,11 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+
 uint32_t lastTick = 0;  // 上次读取时间戳
 float dt = 0.0f;        // 时间间隔
 float throttle = 50.0f; // 示例总推力（0-100%，可从遥控器输入或固定）
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -115,8 +117,10 @@ int main(void)
    
     // 调用维稳函数（传入throttle和dt）
     Stabilize_Drone(throttle, dt);
+   
+    // 简单延时，控制循环频率（可根据需要调整）
+    HAL_Delay(2); 
 
-    HAL_Delay(2);  // 简单延时，控制循环频率（可根据需要调整）
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */

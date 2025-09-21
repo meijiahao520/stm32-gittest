@@ -23,3 +23,4 @@ HAL_StatusTypeDef MPU6050_ReadGyro(I2C_HandleTypeDef *hi2c, GyroData *gyro);
 HAL_StatusTypeDef MPU6050_UpdateData(I2C_HandleTypeDef *hi2c, float *dt_out);
 
 #endif /* MPU_6050_H_ */
+

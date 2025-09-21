@@ -1,6 +1,7 @@
 #include "motor.h"
 #include "pid.h"
 #include "MPU_6050.h"
+#include "math.h"
 
 // 电机初始化（假设使用TIM1的4个通道）
 void Motor_Init(void) {
@@ -17,8 +18,6 @@ void Motor_Init(void) {
 
 void Motor_SetThrottle(uint8_t motor_id, float throttle) {
     uint32_t pwm_value = (uint32_t)(throttle * 1000.0f);  // PWM周期为1000（0-1000对应0-100%）
-    pwm_value = (pwm_value > 1000) ? 1000 : pwm_value;  // 限制最大值
-    pwm_value = (pwm_value < 0) ? 0 : pwm_value;        // 限制最小值
 
     switch (motor_id) {
         case 1: __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, pwm_value); break;
@@ -59,3 +58,4 @@ void Stabilize_Drone(float throttle, float dt) {
     Motor_SetThrottle(3, motor3);
     Motor_SetThrottle(4, motor4);
 }
+

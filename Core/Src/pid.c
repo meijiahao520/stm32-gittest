@@ -14,3 +14,4 @@ float PID_Update(PID_Controller *pid, float error, float dt) {
     pid->prev_error = error;
     return pid->Kp * error + pid->Ki * pid->integral + pid->Kd * derivative;
 }
+
