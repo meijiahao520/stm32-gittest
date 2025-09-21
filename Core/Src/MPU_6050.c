@@ -4,7 +4,8 @@
 #ifndef M_PI
 #define M_PI acos(-1.0)
 #endif
-volatilexx float roll = 0.0f, pitch = 0.0f, yaw = 0.0f;
+// 添加全局变量用于存储角度和时间戳（假设在.h中声明）
+volatile float roll = 0.0f, pitch = 0.0f, yaw = 0.0f;
 static uint32_t lastUpdateTick = 0;
 const float alpha = 0.98f;  // 互补滤波系数（可调整，0.98表示更信任陀螺仪）
 
