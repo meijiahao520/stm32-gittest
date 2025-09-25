@@ -11,9 +11,6 @@ volatile float roll = 0.0f, pitch = 0.0f, yaw = 0.0f;
 static uint32_t lastUpdateTick = 0;
 const float alpha = 0.98f;  // 互补滤波系数（可调整，0.98表示更信任陀螺仪）
 
-AccelData latest_accel = {0, 0, 0};
-GyroData latest_gyro = {0, 0, 0};
-
 HAL_StatusTypeDef MPU6050_Init(I2C_HandleTypeDef *hi2c) {
     // 检查设备是否就绪（非阻塞，单次检查）
     if (HAL_I2C_IsDeviceReady(hi2c, MPU6050_ADDR, 3, 100) != HAL_OK) {
@@ -57,11 +54,6 @@ HAL_StatusTypeDef MPU6050_UpdateData(I2C_HandleTypeDef *hi2c,float *dt_out) {
     if (MPU6050_ReadAccel(hi2c, &accel) != HAL_OK || MPU6050_ReadGyro(hi2c, &gyro) != HAL_OK) {
         return HAL_ERROR;  // 读取失败
     }
-
-    // 更新全局变量
-    latest_accel = accel;
-    latest_gyro = gyro;
-
     // 用户处理代码区域：在此处添加对accel.x/y/z和gyro.x/y/z的处理逻辑  
     // 计算时间间隔（dt，单位秒）
     uint32_t currentTick = HAL_GetTick();

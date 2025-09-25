@@ -30,8 +30,7 @@
 #include "motor.h"
 #include "pid.h"
 #include "nrf24L01.h"
-#include "ps2.h"
-#include "ANO_DT.h"
+#include "ps2.h"  
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -109,11 +108,7 @@ int main(void)
       Error_Handler();  // 初始化失败
   }
   Motor_Init();  // 初始化电机
-  PS2_Init();
-
-  // 启用USART1接收中断
-  uint8_t rx_data;
-  HAL_UART_Receive_IT(&huart1, &rx_data, 1);
+  PS2_Init(); 
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -139,9 +134,6 @@ int main(void)
         Error_Handler();
     }
     Stabilize_Drone(throttle, dt);
-
-    // ANO_DT 数据交换
-    ANO_DT_Data_Exchange();
 
     HAL_Delay(2);  // 2ms 循环
   }
