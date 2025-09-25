@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "i2c.h"
+#include "spi.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -28,6 +29,8 @@
 #include "MPU_6050.h"
 #include "motor.h"
 #include "pid.h"
+#include "nrf24L01.h"
+#include "ps2.h"  
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -52,7 +55,7 @@
 uint32_t lastTick = 0;  // 上次读取时间戳
 float dt = 0.0f;        // 时间间隔
 float throttle = 50.0f; // 示例总推力（0-100%，可从遥控器输入或固定）
-
+PS2_Status ps2_status;  // PS2 状态结构体
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -98,11 +101,14 @@ int main(void)
   MX_I2C1_Init();
   MX_USART1_UART_Init();
   MX_TIM1_Init();
+  MX_SPI2_Init();
+  MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
   if (MPU6050_Init(&hi2c1) != HAL_OK) {
       Error_Handler();  // 初始化失败
   }
   Motor_Init();  // 初始化电机
+  PS2_Init(); 
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -110,18 +116,26 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-    // 更新MPU6050数据并获取dt
-    if (MPU6050_UpdateData(&hi2c1, &dt) != HAL_OK) {
-        Error_Handler();  // 处理错误
-    }
-   
-    // 调用维稳函数（传入throttle和dt）
-    Stabilize_Drone(throttle, dt);
-   
-    // 简单延时，控制循环频率（可根据需要调整）
-    HAL_Delay(2); 
 
     /* USER CODE BEGIN 3 */
+    // 读取 PS2 数据
+    uint8_t ps2_data[9];  // PS2 数据缓冲区（5 字节命令 + 4 字节数据）
+    if (PS2_ReadData(ps2_data)) {
+        PS2_ParseButtons(ps2_data, &ps2_status);
+        // 处理数据：更新目标姿态和推力（示例）
+        throttle = (float)ps2_status.joystick_ly / 255.0f * 100.0f;  // 左摇杆 Y 轴控制推力
+        target_roll = (float)ps2_status.joystick_lx / 255.0f * 180.0f - 90.0f;  // 左摇杆 X 轴控制滚转
+        target_pitch = (float)ps2_status.joystick_ry / 255.0f * 180.0f - 90.0f;  // 右摇杆 Y 轴控制俯仰
+        target_yaw = (float)ps2_status.joystick_rx / 255.0f * 180.0f - 90.0f;  // 右摇杆 X 轴控制偏航
+    }
+
+    // 更新姿态和维稳
+    if (MPU6050_UpdateData(&hi2c1, &dt) != HAL_OK) {
+        Error_Handler();
+    }
+    Stabilize_Drone(throttle, dt);
+
+    HAL_Delay(2);  // 2ms 循环
   }
   /* USER CODE END 3 */
 }

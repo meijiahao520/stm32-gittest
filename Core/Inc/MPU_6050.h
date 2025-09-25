@@ -1,5 +1,6 @@
 #ifndef MPU_6050_H_
 #define MPU_6050_H_
+#endif
 
 #include "i2c.h"
 

@@ -1,5 +1,6 @@
 #ifndef PID_H_  /* Include guard */
 #define PID_H_
+#endif
 
 #include "stdint.h"
 

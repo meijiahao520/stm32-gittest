@@ -1,5 +1,6 @@
 #ifndef MOTOR_H_
 #define MOTOR_H_
+#endif
 
 #include "tim.h"  // 假设使用TIM进行PWM控制，包含tim.h
 
