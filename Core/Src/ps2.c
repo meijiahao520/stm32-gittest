@@ -1,24 +1,16 @@
 #include "ps2.h"
 #include "spi.h"
 
-extern SPI_HandleTypeDef hspi1;  // 使用SPI1，假设在main.c中定义
+extern SPI_HandleTypeDef hspi1;  // SPI句柄，在main.c中定义
 
 // PS2手柄初始化
 void PS2_Init(void) {
-    // 初始化SPI（在main.c中调用HAL_SPI_Init）
-    // 设置CS引脚为输出
-    __HAL_RCC_GPIOA_CLK_ENABLE();
-    GPIO_InitTypeDef GPIO_InitStruct = {0};
-    GPIO_InitStruct.Pin = GPIO_PIN_4;  // CS引脚，调整为PA4
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);  // 默认高电平
+    // SPI 初始化已在 main.c 中调用 MX_SPI1_Init()
+    // GPIO 已由 CubeMX 配置，无需手动初始化
 }
 
 // 读取PS2手柄数据
-uint8_t PS2_ReadData(uint8_t *data) {
+uint8_t PS2_ReadData(uint8_t *data) {      
     uint8_t cmd[5] = {0x01, 0x42, 0x00, 0x00, 0x00};  // PS2读取命令
     uint8_t recv[5];
     
